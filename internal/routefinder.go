@@ -3,7 +3,7 @@ package server
 type RouteFinder struct {
 	store Store
 
-	Graph       [][]int
+	Graph       [][][]int
 	NodesToName []string
 	NameToNodes map[string]int
 
@@ -15,11 +15,11 @@ func NewRouteFinder(nodes []string, edges [][]int, store Store) *RouteFinder {
 
 	noOfNodes := len(nodes)
 
-	rf.Graph = make([][]int, noOfNodes)
+	rf.Graph = make([][][]int, noOfNodes)
 
 	for _, edge := range edges {
-		rf.Graph[edge[0]] = append(rf.Graph[edge[0]], edge[1])
-		rf.Graph[edge[1]] = append(rf.Graph[edge[1]], edge[0])
+		rf.Graph[edge[0]] = append(rf.Graph[edge[0]], []int{edge[1], 1})
+		rf.Graph[edge[1]] = append(rf.Graph[edge[1]], []int{edge[0], 1})
 	}
 
 	rf.NameToNodes = map[string]int{}
@@ -34,3 +34,5 @@ func NewRouteFinder(nodes []string, edges [][]int, store Store) *RouteFinder {
 
 	return rf
 }
+
+//
