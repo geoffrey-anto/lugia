@@ -6,10 +6,10 @@ import (
 	"net"
 )
 
-func HandleRequest(conn net.Conn) {
+func HandleRequest(conn net.Conn, s *Server) {
 	// TODO: Handle the request from client
 	for {
-		buf := make([]byte, 1)
+		buf := make([]byte, 2048)
 
 		n, err := conn.Read(buf)
 
@@ -18,5 +18,7 @@ func HandleRequest(conn net.Conn) {
 		}
 
 		fmt.Printf("Message From Client %s", string(buf[:n]))
+
+		fmt.Printf("%+v %+v", s.Rf.Graph, s.Rf.NameToNodes)
 	}
 }

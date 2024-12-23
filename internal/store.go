@@ -1,8 +1,8 @@
 package server
 
 type Store interface {
-	Read(string) string
-	Write(string) string
+	Read() string
+	Write(string)
 }
 
 type InMemoryStore struct {

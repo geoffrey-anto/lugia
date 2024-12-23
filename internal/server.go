@@ -7,8 +7,8 @@ import (
 )
 
 type Server struct {
-	Id string
-
+	Id  string
+	Rf  *RouteFinder
 	Lis net.Listener
 }
 
@@ -20,9 +20,14 @@ func NewServer(addr string, port int, id string) *Server {
 		os.Exit(1)
 	}
 
-	return &Server{
-		Id: id,
+	nodes := []string{"A", "B", "C", "D"}
+	edges := [][]int{{0, 1}, {1, 2}, {2, 3}}
 
+	var store Store = &InMemoryStore{}
+
+	return &Server{
+		Id:  id,
+		Rf:  NewRouteFinder(nodes, edges, store),
 		Lis: lis,
 	}
 }
@@ -33,7 +38,7 @@ func (s *Server) Start() {
 		if conn, err := s.Lis.Accept(); err == nil {
 			fmt.Printf("New Connection from %v\n", conn.RemoteAddr().String())
 
-			go HandleRequest(conn)
+			go HandleRequest(conn, s)
 		}
 	}
 }
