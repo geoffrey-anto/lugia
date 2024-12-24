@@ -1,5 +1,7 @@
 package server
 
+const MAX_COST float64 = 1e8
+
 type Position struct {
 	Position int
 	End      int
@@ -22,7 +24,7 @@ type RouteFinder struct {
 
 	NoOfNodes int
 
-	ShortestPaths [][]int
+	ShortestPaths [][]float64
 }
 
 func NewRouteFinder(nodes []string, edges [][]int, store Store) *RouteFinder {
@@ -49,6 +51,16 @@ func NewRouteFinder(nodes []string, edges [][]int, store Store) *RouteFinder {
 	rf.NodesToName = nodes
 	rf.store = store
 	rf.Positions = make(map[string]Position)
+
+	rf.ShortestPaths = make([][]float64, noOfNodes)
+
+	for i := 0; i < noOfNodes; i++ {
+		rf.ShortestPaths[i] = make([]float64, noOfNodes)
+
+		for j := 0; j < noOfNodes; j++ {
+			rf.ShortestPaths[i][j] = MAX_COST
+		}
+	}
 
 	return rf
 }
@@ -108,6 +120,26 @@ func (rf *RouteFinder) End(id string) (string, bool) {
 	return "User reached the destination", false
 }
 
+func (rf *RouteFinder) Next(id string) (string, float64, bool) {
+	if _, ok := rf.Positions[id]; !ok {
+		return "", MAX_COST, false
+	}
+
+	currentPosition := rf.Positions[id].Position
+
+	nextNearest := -1
+	nextNearestCost := MAX_COST
+
+	for _, vertex := range rf.Graph[currentPosition] {
+		if float64(rf.ShortestPaths[currentPosition][vertex.Index]) < nextNearestCost {
+			nextNearest = vertex.Index
+			nextNearestCost = vertex.Cost
+		}
+	}
+
+	return rf.NodesToName[nextNearest], nextNearestCost, true
+}
+
 // func (rf *RouteFinder) GetPath(id string) ([]string, bool) {
 // 	if _, ok := rf.Positions[id]; !ok {
 // 		return []string{}, false
@@ -115,7 +147,7 @@ func (rf *RouteFinder) End(id string) (string, bool) {
 
 // 	currentPosition := rf.Positions[id]
 
-// 	//
+//
 
 // }
 
